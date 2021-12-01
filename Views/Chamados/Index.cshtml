@@ -1,0 +1,222 @@
+﻿@model Gerencial.Models.Chamados
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+
+    function limpar_filtro() {
+        document.getElementById("ConsultaChamado").value = null;
+        document.getElementById("ConsultaStatus").value = '0';
+        document.getElementById("ConsultaRota").value = '0';
+        document.getElementById("ConsultaEstado").value = '0';
+        document.getElementById("ConsultaAgencia").value = '0';
+        document.getElementById("ConsultaRelatado").value = '0';
+        document.getElementById("ConsultaDataInicio").value = null;
+        document.getElementById("ConsultaDataFim").value = null;
+    }
+
+    function filtro_pesquisa() {
+        if (document.getElementById("form_filtro").style.display == 'none')
+            document.getElementById("form_filtro").style.display = 'block';
+        else
+            document.getElementById("form_filtro").style.display = 'none';
+    }
+
+    function confirmExclusao(ur) {
+        swal({
+            title: "Deseja Excluir?",
+            text: "",
+            type: "error",
+            showCancelButton: true,
+            confirmButtonText: "Sim!",
+            cancelButtonText: "Não",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }, function (isConfirm) {
+            if (isConfirm) {
+                swal("Deletado!", "Boleto deletado com sucesso.", "success");
+                url = ur
+                window.location = url;
+            } else {
+                swal("Cancelado", "Não houve a exclusão :)", "error");
+            }
+        });
+    }
+</script>
+
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-th-list"></i> Gerenciar Chamados</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item">Chamados</li>
+        <li class="breadcrumb-item active"><a href="#">Gerenciar</a></li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-md-14">
+        <div class="tile">
+            <div class="col-lg-6">
+                @{
+                    if (ViewBag.Msg != null)
+                    {
+                        if (ViewBag.tipo == 1)
+                        {
+                            <div class="bs-component">
+                                <div class="alert alert-dismissible alert-success">
+                                    <button class="close" type="button" data-dismiss="alert">×</button>@ViewBag.Msg
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="bs-component">
+                                <div class="alert alert-dismissible alert-danger">
+                                    <button class="close" type="button" data-dismiss="alert">×</button><strong>Atenção! </strong>@ViewBag.Msg
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+
+                <h4 class="card-title" onclick="filtro_pesquisa();" style="cursor:pointer;">Filtro de busca</h4>
+
+                @using (Html.BeginForm("Busca", "Chamados", FormMethod.Post, new { @id = "form_filtro", @name = "form_filtro", style = "display:none", @class = "form-valide" }))
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ConsultaChamado, "Número do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                        @Html.EditorFor(model => model.ConsultaChamado, new { htmlAttributes = new { @class = "form-control", Value = @Model.ConsultaChamado } })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ConsultaStatus, "Status do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                        <select class="form-control" id="ConsultaStatus" name="ConsultaStatus">
+                            <option value="0">Selecione o Status</option>
+                            <option @(Model.ConsultaStatus.ToUpper() == "ABERTO" ? "selected" : "") value="Aberto">Aberto</option>
+                            <option @(Model.ConsultaStatus.ToUpper() == "FECHADO" ? "selected" : "") value="Fechado">Fechado</option>
+                            <option @(Model.ConsultaStatus.ToUpper() == "MATERIAL" ? "selected" : "") value="Material">Material</option>
+                            <option @(Model.ConsultaStatus.ToUpper() == "CANCELADO" ? "selected" : "") value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ConsultaEstado, "Estado", new { htmlAttributes = new { @class = "control-label" } })
+                        <select class="form-control" id="ConsultaEstado" name="ConsultaEstado">
+                            <option value="0">Selecione o Estado</option>
+                            <option @(Model.ConsultaEstado.ToUpper() == "MINAS GERAIS" ? "selected" : "") value="MINAS GERAIS">MINAS GERAIS</option>
+                            <option @(Model.ConsultaEstado.ToUpper() == "ESPIRITO SANTO" ? "selected" : "") value="ESPIRITO SANTO">ESPÍRITO SANTO</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ConsultaAgencia, "Agencia", new { htmlAttributes = new { @class = "control-label" } })
+                        <select class="form-control" id="ConsultaAgencia" name="ConsultaAgencia">
+                            <option value="0">Selecione a agencia</option>
+                            @foreach (var item in Model.MAgencia)
+                            {
+                                <option @(Model.utl.DecodificaId(Model.ConsultaAgencia) == Model.utl.DecodificaId(item.Id) ? "selected" : "") value="@item.Id">@item.NAgencia - @item.Cidade</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ConsultaRota, "Rota de Atendimento", new { htmlAttributes = new { @class = "control-label" } })
+                        <select class="form-control" id="ConsultaRota" name="ConsultaRota">
+                            <option value="0">Selecione a Rota de Aendimento</option>
+                            <option @(Model.ConsultaRota.ToUpper() == "ES" ? "selected" : "") value="ES">ESPIRITO SANTO</option>
+                            <option @(Model.ConsultaRota.ToUpper() == "NORTE" ? "selected" : "") value="NORTE">NORTE DE MINAS</option>
+                            <option @(Model.ConsultaRota.ToUpper() == "GRANDE BH" ? "selected" : "") value="GRANDE BH">GRANDE BH</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ConsultaRelatado, "Prestador do Serviço", new { htmlAttributes = new { @class = "control-label" } })
+                        <select class="form-control" id="ConsultaRelatado" name="ConsultaRelatado">
+                            <option value="0">Selecione o prestador de serviço</option>
+                            @foreach (var item in Model.MRota)
+                            {
+                                <option @(Model.ConsultaRelatado == item.Id.ToString() ? "selected" : "") value="@item.Id">@item.Nome</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="chamado">Data de Vencimento</label>
+                        <input type="date" class="form-control" id="ConsultaDataInicio" name="ConsultaDataInicio" placeholder="dd/mm/yyyy" value="@Model.ConsultaDataInicio">
+                        <label class="col-lg-3 col-form-label">até</label>
+                        <input type="date" class="form-control" id="ConsultaDataFim" name="ConsultaDataFim" placeholder="dd/mm/yyyy" value="@Model.ConsultaDataFim">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" >Buscar</button>
+                        &nbsp;&nbsp;
+                        <button type="button" onclick="limpar_filtro()" class="btn btn-inverse">Limpar</button>
+                    </div>
+
+                }
+
+            </div>
+            <div class="tile-body">
+                    <table class="table table-hover table-bordered" id="myTable">
+                        <thead>
+                            <tr>
+                                <th width="7%">Chamado</th>
+                                <th width="16%">Agencia</th>
+                                <th width="14%">Categoria</th>
+                                <th width="20%">Descricao</th>
+                                <th width="10%">Rota</th>
+                                <th width="7%">Data</th>
+                                <th width="7%">CPA</th>
+                                <th width="7%">CPC</th>
+                                <th width="5%" style="text-align:center !important;">Sinalizar</th>
+                                <th width="4%" style="text-align:center !important;">Anexo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.MChamados)
+                            {
+                                var caminhoDocumento = Server.MapPath("~/Arquivos/Chamado/" + item.DocumentoChamado);
+                                var style = string.Empty;
+                                
+                                if (item.DataAtendimento != null)
+                                { style = "background-color:powderblue;"; }
+                                else
+                                { style = ""; }
+
+                                <tr style="@style">
+                                    <td>@item.Numero</td>
+                                    <td>@item.Local.ToUpper()</td>
+                                    <td>@item.SubCategoria</td>
+                                    <td>@item.Detalhe</td>
+                                    <td>@item.Rota</td>
+                                    <td>@item.DataInicio.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.SlaAtendimento.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.SlaConclusao.ToString("dd/MM/yyyy")</td>
+                                    <td style="text-align:center !important; vertical-align:middle !important;">
+                                        <a href="@Url.Action("Sinaliza", "Chamados", new { Id = item.Id })">
+                                            <i class="fa fa-file-pdf-o" style="font-size:large"></i>
+                                        </a>
+                                    </td>
+                                    <td style="text-align:center !important; vertical-align:middle !important;">
+                                        @if (File.Exists(caminhoDocumento))
+                                        {
+                                            <a download href="~/arquivos/chamado/@item.DocumentoChamado">
+                                                <i class="fa fa-print" style="font-size:large"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span style="color:#F00; font-weight:bold"> - </span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    </div>
+</div>

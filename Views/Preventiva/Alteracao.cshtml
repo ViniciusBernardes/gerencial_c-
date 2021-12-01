@@ -1,0 +1,128 @@
+﻿@model Gerencial.Models.Preventiva
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-th-list"></i> Alterar Preventiva</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item">Preventiva</li>
+        <li class="breadcrumb-item active"><a href="#">Alterar</a></li>
+    </ul>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="tile">
+
+            <div class="row">
+                <div class="col-lg-12" id="alerta" style="display:none;">
+                    <div class="bs-component">
+                        <div class="alert alert-dismissible alert-danger">
+                            <button class="close" type="button" data-dismiss="alert">×</button>
+                            <span id="textAlerta"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    @using (Html.BeginForm("Alterar", "Preventiva", FormMethod.Post, new { @class = "form-valide", enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <input type="hidden" id="Id" name="Id" value="@Model.MPreventivaSimples.Id" />
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Mes, "Mês da Preventiva", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Mes" name="Mes">
+                                <option value="">Selecione o mes</option>
+                                <option @(Model.MPreventivaSimples.Mes == "1" ? "selected" : "") value="1">Janeiro</option>
+                                <option @(Model.MPreventivaSimples.Mes == "2" ? "selected" : "") value="2">Fevereiro</option>
+                                <option @(Model.MPreventivaSimples.Mes == "3" ? "selected" : "") value="3">Março</option>
+                                <option @(Model.MPreventivaSimples.Mes == "4" ? "selected" : "") value="4">Abril</option>
+                                <option @(Model.MPreventivaSimples.Mes == "5" ? "selected" : "") value="5">Maio</option>
+                                <option @(Model.MPreventivaSimples.Mes == "6" ? "selected" : "") value="6">Junho</option>
+                                <option @(Model.MPreventivaSimples.Mes == "7" ? "selected" : "") value="7">Julho</option>
+                                <option @(Model.MPreventivaSimples.Mes == "8" ? "selected" : "") value="8">Agosto</option>
+                                <option @(Model.MPreventivaSimples.Mes == "9" ? "selected" : "") value="9">Setembro</option>
+                                <option @(Model.MPreventivaSimples.Mes == "10" ? "selected" : "") value="10">Outubro</option>
+                                <option @(Model.MPreventivaSimples.Mes == "11" ? "selected" : "") value="11">Novembro</option>
+                                <option @(Model.MPreventivaSimples.Mes == "12" ? "selected" : "") value="12">Dezembro</option>
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Mes)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Local, "Agencia", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Local" name="Local" data-val="true" data-val-required="Favor selecionar a agencia">
+                                <option value="">Selecione a agencia</option>
+                                @foreach (var item in Model.MAgencia)
+                                {
+                                    <option @(Model.MPreventivaSimples.IdLocal == Model.utl.DecodificaId(item.Id) ? "selected" : "") value="@item.Id">@item.NAgencia - @item.Cidade</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Local)
+                        </div>
+                        <hr />
+                        <fieldset>
+                            <h5>Preventiva Elétirca/Hidraulica</h5>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.DataPreventivaEletrica, "Data da Preventiva Elétrica", new { htmlAttributes = new { @class = "control-label" } })
+                                @Html.EditorFor(model => model.DataPreventivaEletrica, new { htmlAttributes = new { @class = "form-control", @type = "date", Value = @Model.MPreventivaSimples.DataPreventivaEletrica?.ToString("yyyy-MM-dd") } })
+                                @Html.ValidationMessageFor(model => model.DataPreventivaEletrica)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.AnexoEletrica, "Anexar Preventiva Elétrica", new { htmlAttributes = new { @class = "control-label" } })
+                                <input type="file" name="AnexoEletrica" id="AnexoEletrica" class="form-control">
+                                @Html.ValidationMessageFor(model => model.AnexoEletrica)
+                            </div>
+                            @{
+                                var caminhoPrevEletrica = Server.MapPath("~/Arquivos/Preventiva/Eletrica/" + @Model.MPreventivaSimples.Mes + "_" + @Model.MPreventivaSimples.IdLocal + ".pdf");
+                                var linkPrevEletrica = "/Arquivos/Preventiva/Eletrica/" + @Model.MPreventivaSimples.Mes + "_" + @Model.MPreventivaSimples.IdLocal + ".pdf";
+                            }
+                            @if (File.Exists(caminhoPrevEletrica))
+                            {
+                                <div class="form-group">
+                                    <a href="@linkPrevEletrica">
+                                        Link da Preventiva <i class="fa fa-print" style="font-size:large"></i>
+                                    </a>
+                                </div>
+                            }
+                        </fieldset>
+                        <hr />
+                        <fieldset>
+                            <h5>Preentiva Ar Condicionado</h5>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.DataPreventivaAr, "Data da Preventiva Ar Condicionado", new { htmlAttributes = new { @class = "control-label" } })
+                                @Html.EditorFor(model => model.DataPreventivaAr, new { htmlAttributes = new { @class = "form-control", @type = "date", Value = @Model.MPreventivaSimples.DataPreventivaAr?.ToString("yyyy-MM-dd") } })
+                                @Html.ValidationMessageFor(model => model.DataPreventivaAr)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.AnexoAr, "Anexar Preventiva Ar Condicionado", new { htmlAttributes = new { @class = "control-label" } })
+                                <input type="file" name="AnexoAr" id="AnexoAr" class="form-control">
+                                @Html.ValidationMessageFor(model => model.AnexoAr)
+                            </div>
+                            @{
+                                var caminhoPrevAr = Server.MapPath("~/Arquivos/Preventiva/ArCondicionado/" + @Model.MPreventivaSimples.Mes + "_" + @Model.MPreventivaSimples.IdLocal + ".pdf");
+                                var linkPrevAr = "/Arquivos/Preventiva/ArCondicionado/" + @Model.MPreventivaSimples.Mes + "_" + @Model.MPreventivaSimples.IdLocal + ".pdf";
+                            }
+                            @if (File.Exists(caminhoPrevAr))
+                            {
+                                <div class="form-group">
+                                    <a href="@linkPrevAr">
+                                        Link da Preventiva <i class="fa fa-print" style="font-size:large"></i>
+                                    </a>
+                                </div>
+                            }
+                        </fieldset>
+
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit">Alterar</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

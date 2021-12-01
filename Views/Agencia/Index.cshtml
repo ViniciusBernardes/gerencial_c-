@@ -1,0 +1,175 @@
+﻿@model  Gerencial.Models.Agencia
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+
+    function limpar_filtro() {
+        document.getElementById("ConsultaTipo").value = '0';
+        document.getElementById("ConsultaStatus").value = '0';
+        document.getElementById("ConsultaRota").value = '0';
+        document.getElementById("ConsultaDataInicio").value = '';
+        document.getElementById("ConsultaDataFim").value = '';
+    }
+
+    function cadastro() {
+        if (document.getElementById("form_filtro").style.display == 'none')
+            document.getElementById("form_filtro").style.display = 'block';
+        else
+            document.getElementById("form_filtro").style.display = 'none';
+    }
+
+    function confirmExclusao(ur) {
+        swal({
+            title: "Deseja Excluir?",
+            text: "",
+            type: "error",
+            showCancelButton: true,
+            confirmButtonText: "Sim!",
+            cancelButtonText: "Não",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }, function (isConfirm) {
+            if (isConfirm) {
+                swal("Deletado!", "Agencia deletada com sucesso.", "success");
+                url = ur
+                window.location = url;
+            } else {
+                swal("Cancelado", "Não houve a exclusão :)", "error");
+            }
+        });
+    }
+
+</script>
+
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-th-list"></i> Gerenciar Agencias</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item">Agencias</li>
+        <li class="breadcrumb-item active"><a href="#">Gerenciar</a></li>
+    </ul>
+</div>
+
+<div class="row">
+
+    <div class="col-md-12" id="form_filtro" style="display:none">
+        <div class="tile">
+            <div class="tile-body">
+
+                <div class="col-lg-6">
+                    <h4 class="card-title" onclick="cadastro();" style="cursor:pointer;">Cadastro de Agencia</h4>
+                    @using (Html.BeginForm("Cadastrar", "Agencia", FormMethod.Post, new { @class = "form-valide" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.NAgencia, "Número da Agencia", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.NAgencia, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.NAgencia)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Cidade, "Local", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Cidade, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Cidade)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Km, "Distância da Sede", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Km, new { htmlAttributes = new { @class = "form-control"} })
+                            @Html.ValidationMessageFor(model => model.Km)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rota, "Região", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Rota" name="Rota" data-val="true" data-val-required="Favor selecionar a rota">
+                                <option value="">Selecione a Rota da agencia</option>
+                                <option value="ESPIRITO SANTO">Espírito Santo</option>
+                                <option value="Norte">Norte de Minas</option>
+                                <option value="Grande BH">Grande BH</option>
+                                <option value="Triangulo Mineiro">Triângulo Mineiro</option>
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Rota)
+                        </div>
+
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit">Cadastrar</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="tile">
+
+            @{
+                if (ViewBag.Msg != null)
+                {
+                    if (ViewBag.tipo == 1)
+                    {
+                        <div class="bs-component">
+                            <div class="alert alert-dismissible alert-success">
+                                <button class="close" type="button" data-dismiss="alert">×</button>@ViewBag.Msg
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="bs-component">
+                            <div class="alert alert-dismissible alert-danger">
+                                <button class="close" type="button" data-dismiss="alert">×</button><strong>Atenção! </strong>@ViewBag.Msg
+                            </div>
+                        </div>
+                    }
+                }
+            }
+
+            <div class="tile-body">
+                <div class="tile-title-w-btn">
+                    <h4>Lista de Agencias</h4>
+                    <p><a class="btn btn-primary icon-btn" href="javascript:void(0)" onclick="cadastro();"><i class="fa fa-plus"></i>Adicionar Agencia	</a></p>
+                </div>
+                <br />
+                <table class="table table-hover table-bordered" id="myTable">
+                    <thead>
+                        <tr>
+                            <th width="15%">Agencia</th>
+                            <th width="30%">Local</th>
+                            <th width="20%">Rota</th>
+                            <th width="15%">Distancia</th>
+                            <th width="10%" style="text-align:center !important;">Editar</th>
+                            <th width="10%" style="text-align:center !important;">Excluir</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.MAgencia)
+                        {
+                            <tr>
+                                <td>@item.NAgencia</td>
+                                <td>@item.Cidade.ToUpper()</td>
+                                <td>@item.Rota</td>
+                                <td>@item.Km</td>
+                                <td style="text-align:center !important; vertical-align:middle !important;">
+                                    <a href="@Url.Action("Alteracao", "Agencia", new { Id = item.Id })">
+                                        <i class="fa fa-pencil" style="font-size:large"></i>
+                                    </a>
+                                </td>
+                                <td style="text-align:center !important; vertical-align:middle !important;">
+                                    <a href="#" onclick="confirmExclusao('@Url.Action("Excluir", "Agencia", new { Id = item.Id })');" id="confirmExclusao">
+                                        <i class="fa fa-remove" style="font-size:large"></i>
+                                    </a>
+                                </td>
+                            </tr>
+
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

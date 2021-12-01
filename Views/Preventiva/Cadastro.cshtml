@@ -1,0 +1,95 @@
+﻿@model Gerencial.Models.Preventiva
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-th-list"></i> Cadastrar Preventiva</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item">Preventiva</li>
+        <li class="breadcrumb-item active"><a href="#">Cadastrar</a></li>
+    </ul>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="tile">
+
+            <div class="row">
+                <div class="col-lg-12" id="alerta" style="display:none;">
+                    <div class="bs-component">
+                        <div class="alert alert-dismissible alert-danger">
+                            <button class="close" type="button" data-dismiss="alert">×</button>
+                            <span id="textAlerta"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    @using (Html.BeginForm("Cadastrar", "Preventiva", FormMethod.Post, new { @class = "form-valide", enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Mes, "Mês da Preventiva", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Mes" name="Mes">
+                                <option value="">Selecione o mes</option>
+                                <option value="1">Janeiro</option>
+                                <option value="2">Fevereiro</option>
+                                <option value="3">Março</option>
+                                <option value="4">Abril</option>
+                                <option value="5">Maio</option>
+                                <option value="6">Junho</option>
+                                <option value="7">Julho</option>
+                                <option value="8">Agosto</option>
+                                <option value="9">Setembro</option>
+                                <option value="10">Outubro</option>
+                                <option value="11">Novembro</option>
+                                <option value="12">Dezembro</option>
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Mes)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Local, "Agencia", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Local" name="Local" data-val="true" data-val-required="Favor selecionar a agencia">
+                                <option value="">Selecione a agencia</option>
+                                @foreach (var item in Model.MAgencia)
+                                {
+                                    <option value="@item.Id">@item.NAgencia - @item.Cidade</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Local)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DataPreventivaEletrica, "Data da Preventiva Elétrica", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.DataPreventivaEletrica, new { htmlAttributes = new { @class = "form-control", @type = "date" } })
+                            @Html.ValidationMessageFor(model => model.DataPreventivaEletrica)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.AnexoEletrica, "Anexar Preventiva Elétrica", new { htmlAttributes = new { @class = "control-label" } })
+                            <input type="file" name="AnexoEletrica" id="AnexoEletrica" class="form-control">
+                            @Html.ValidationMessageFor(model => model.AnexoEletrica)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DataPreventivaAr, "Data da Preventiva Ar Condicionado", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.DataPreventivaAr, new { htmlAttributes = new { @class = "form-control", @type = "date" } })
+                            @Html.ValidationMessageFor(model => model.DataPreventivaAr)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.AnexoAr, "Anexar Preventiva Ar Condicionado", new { htmlAttributes = new { @class = "control-label" } })
+                            <input type="file" name="AnexoAr" id="AnexoAr" class="form-control">
+                            @Html.ValidationMessageFor(model => model.AnexoAr)
+                        </div>
+
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit">Cadastrar</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

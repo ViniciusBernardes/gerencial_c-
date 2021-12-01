@@ -1,0 +1,156 @@
+﻿@model Gerencial.Models.Chamados
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .form-horizontal label{
+        font-weight:bold;
+    }
+</style>
+
+<script>
+    function confirmExclusao(ur){
+        swal({
+            title: "Deseja Excluir o Chamado?",
+            text: "",
+            type: "error",
+            showCancelButton: true,
+            confirmButtonText: "Sim!",
+            cancelButtonText: "Não",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }, function (isConfirm) {
+            if (isConfirm) {
+                swal("Deletado!", "Chamado deletado com sucesso.", "success");
+                url = ur
+	            window.location = url;
+            } else {
+                swal("Cancelado", "Não houve a exclusão :)", "error");
+            }
+        });
+    }
+</script>
+
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-th-list"></i> Sinaliza Chamado</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item">Chamado</li>
+        <li class="breadcrumb-item active"><a href="#">Sinaliza</a></li>
+    </ul>
+</div>
+<div class="row">
+    <div class="col-md-10">
+        <div class="tile">
+            <div class="tile-title-w-btn">
+                <h3 class="title">Dados do Chamado</h3>
+                <div class="btn-group">
+                    <a class="btn btn-primary" title="Cadastrar Chamado" href="@Url.Action("Cadastro", "Chamados")"><i class="fa fa-lg fa-plus"></i></a>
+                    <a class="btn btn-primary" href="@Url.Action("Alteracao", "Chamados", new { Id = Model.MChamadoSimples.Id })"><i class="fa fa-lg fa-edit"></i></a>
+                    <a class="btn btn-primary" href="#"  onclick="confirmExclusao('@Url.Action("Excluir", "Chamados", new { Id = Model.MChamadoSimples.Id })');" id="confirmExclusao"><i class="fa fa-lg fa-trash"></i></a>
+                </div>
+            </div>
+            <div class="tile-body">
+                @using (Html.BeginForm("Sinalizar", "Chamados", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <input type="hidden" id="Id" name="Id" value="@Model.MChamadoSimples.Id" />
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Número do Chamado</label>
+                        <div class="col-md-8">
+                            @Model.MChamadoSimples.Numero
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Agencia</label>
+                        <div class="col-md-8">
+                            @Model.MChamadoSimples.Local
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Engenheiro da Rota</label>
+                        <div class="col-md-8">
+                            @Model.utl.Engenheiro(Model.MChamadoSimples.Eng)
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Status do Chamado</label>
+                        <div class="col-md-8">
+                            @Model.MChamadoSimples.Status
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Tipo de Serviço</label>
+                        <div class="col-md-8">
+                            @Model.MChamadoSimples.SubCategoria
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Descrição</label>
+                        <div class="col-md-8">
+                            @Model.MChamadoSimples.Detalhe
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Rota</label>
+                        <div class="col-md-8">
+                            @Model.MChamadoSimples.Execucao
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Data Chamado</label>
+                        <div class="col-md-8">
+                            @Model.MChamadoSimples.DataInicio.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">CPA</label>
+                        <div class="col-md-8">
+                            @Model.MChamadoSimples.SlaAtendimento.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">CPC</label>
+                        <div class="col-md-8">
+                            @Model.MChamadoSimples.SlaConclusao.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Data Atendimento</label>
+                        <div class="col-md-6">
+                            @if (Model.MChamadoSimples.DataAtendimento != null)
+                            {
+                                @Html.EditorFor(model => model.DataAtendimento, new { htmlAttributes = new { @class = "form-control", @type = "date", Value = Model.MChamadoSimples.DataAtendimento?.ToString("yyyy-MM-dd") } })
+                            }
+                            else
+                            {
+                                @Html.EditorFor(model => model.DataAtendimento, new { htmlAttributes = new { @class = "form-control", @type = "date" } })
+                            }
+                            @Html.ValidationMessageFor(model => model.DataAtendimento)
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label col-md-3">Data Conclusão</label>
+                        <div class="col-md-6">
+                            @if (Model.MChamadoSimples.DataConclusao != null)
+                            {
+                                @Html.EditorFor(model => model.DataConclusao, new { htmlAttributes = new { @class = "form-control", @type = "date", Value = Model.MChamadoSimples.DataConclusao?.ToString("yyyy-MM-dd") } })
+                            }
+                            else
+                            {
+                                @Html.EditorFor(model => model.DataConclusao, new { htmlAttributes = new { @class = "form-control", @type = "date" } })
+                            }
+                        </div>
+                    </div>
+                    <div class="tile-footer">
+                        <button class="btn btn-primary" type="submit">Sinalizar</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

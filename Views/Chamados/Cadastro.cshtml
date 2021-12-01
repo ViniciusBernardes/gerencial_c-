@@ -1,0 +1,180 @@
+﻿@model Gerencial.Models.Chamados
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+
+    function verificaChamado(chamado)
+    {
+        jQuery.ajax({
+            type: "POST",
+            url: "/Chamados/VerificaChamado/",
+            data: "{Chamado: '" + chamado + "'}",
+            contentType: "application/json; charset=utf-8",
+		    //data: {name: user_name, pwd: password},
+		    success: function(res) {
+			    if(res != 0)
+				{
+					$("select").prop('disabled', true);
+					$("#textAlerta").html("Chamado Já cadastrado");
+					$("#alerta").show();
+				}
+				else
+				{
+					$("select").prop('disabled', false);
+					$("#textAlerta").html("");
+					$("#alerta").hide();
+				}
+            },
+            error: function (res) {
+                        console.log(res);
+                    }
+	    });
+    }
+
+    function buscaSubCategoria(ur)
+    {
+        jQuery.ajax({
+            type: "POST",
+            url: "/Chamados/BuscaSubCategoria/",
+            data: "{Categoria: '" + ur + "'}",
+            contentType: "application/json; charset=utf-8",
+		    //data: {name: user_name, pwd: password},
+		    success: function(res) {
+			    if (res)
+			    {
+				    // Show Entered Value
+				    //console.log(res);
+				    document.getElementById('SubCategoria').innerHTML= res;
+			    }
+            },
+            error: function (res) {
+                        console.log(res);
+                    }
+	    });
+    }
+
+</script>
+
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-th-list"></i> Cadastrar Chamados</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item">Chamados</li>
+        <li class="breadcrumb-item active"><a href="#">Cadastrar</a></li>
+    </ul>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="tile">
+
+            <div class="row">
+                <div class="col-lg-12" id="alerta" style="display:none;">
+                    <div class="bs-component">
+                        <div class="alert alert-dismissible alert-danger">
+                            <button class="close" type="button" data-dismiss="alert">×</button>
+                            <span id="textAlerta"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    @using (Html.BeginForm("Cadastrar", "Chamados", FormMethod.Post, new { @class = "form-valide", enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Numero, "Número do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Numero, new { htmlAttributes = new { @class = "form-control", onchange = "verificaChamado(this.value)" } })
+                            @Html.ValidationMessageFor(model => model.Numero)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Local, "Agencia", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Local" name="Local" data-val="true" data-val-required="Favor selecionar a agencia">
+                                <option value="">Selecione a agencia</option>
+                                @foreach (var item in Model.MAgencia)
+                                {
+                                    <option value="@item.Id">@item.NAgencia - @item.Cidade</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Local)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Eng, "Engenheiro da Rota", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Eng" name="Eng" data-val="true" data-val-required="Favor selecionar o Engenheiro da rota">
+                                <option value="">Selecione a Rota da agencia</option>
+                                <option value="1">Anselmo Franklin</option>
+                                <option value="2">Vanessa Mara</option>
+                                <option value="3">Alexandre Machado</option>
+                                <option value="4">Alessandro Bulhoes</option>
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Eng)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Status, "Status do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Status" name="Status" data-val="true" data-val-required="Favor selecionar o Status">
+                                <option value="">Selecione o Status</option>
+                                <option value="Aberto">Aberto</option>
+                                <option value="Fechado">Fechado</option>
+                                <option value="Material">Material</option>
+                                <option value="Cancelado">Cancelado</option>
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Status)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Categoria, "Categoria do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Categoria" name="Categoria" onchange="buscaSubCategoria(this.value)" data-val="true" data-val-required="Favor selecionar a categoria">
+                                <option value="">Selecione a Categoria</option>
+                                @foreach (var item in Model.MCategoria)
+                                {
+                                    <option value="@item.Id">@item.Nome</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Categoria)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SubCategoria, "Tipo de Serviço", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="SubCategoria" name="SubCategoria" data-val="true" data-val-required="Favor selecionar o tipo de serviço">
+                                <option value="">Selecione a Categoria</option>
+                            </select>
+                            @Html.ValidationMessageFor(model => model.SubCategoria)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rota, "Direcionamento do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Rota" name="Rota" data-val="true" data-val-required="Favor direcionar o chamado">
+                                <option value="">Selecione a agencia</option>
+                                @foreach (var item in Model.MRota)
+                                {
+                                    <option value="@item.Id">@item.Nome</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Rota)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Detalhe, "Descrição do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Detalhe, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Detalhe)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DataInicio, "Data do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.DataInicio, new { htmlAttributes = new { @class = "form-control", @type = "date" } })
+                            @Html.ValidationMessageFor(model => model.DataInicio)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Arquivo, "Anexar Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            <input type="file" name="Arquivo" id="Arquivo" class="form-control">
+                        </div>
+
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit">Cadastrar</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

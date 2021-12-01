@@ -1,0 +1,203 @@
+﻿@model Gerencial.Models.Chamados
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+
+    function verificaChamado(chamado)
+    {
+        jQuery.ajax({
+            type: "POST",
+            url: "/Chamados/VerificaChamado/",
+            data: "{Chamado: '" + chamado + "'}",
+            contentType: "application/json; charset=utf-8",
+		    //data: {name: user_name, pwd: password},
+		    success: function(res) {
+			    if(res != 0)
+				{
+					$("select").prop('disabled', true);
+					$("#textAlerta").html("Chamado Já cadastrado");
+					$("#alerta").show();
+				}
+				else
+				{
+					$("select").prop('disabled', false);
+					$("#textAlerta").html("");
+					$("#alerta").hide();
+				}
+            },
+            error: function (res) {
+                        console.log(res);
+                    }
+	    });
+    }
+
+    function buscaSubCategoria(ur)
+    {
+        jQuery.ajax({
+            type: "POST",
+            url: "/Chamados/BuscaSubCategoria/",
+            data: "{Categoria: '" + ur + "'}",
+            contentType: "application/json; charset=utf-8",
+		    //data: {name: user_name, pwd: password},
+		    success: function(res) {
+			    if (res)
+			    {
+				    // Show Entered Value
+				    //console.log(res);
+				    document.getElementById('SubCategoria').innerHTML= res;
+			    }
+            },
+            error: function (res) {
+                        console.log(res);
+                    }
+	    });
+    }
+
+</script>
+
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-th-list"></i> Alterar Chamado</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item">Chamado</li>
+        <li class="breadcrumb-item active"><a href="#">Alterar</a></li>
+    </ul>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="tile">
+
+            <div class="row">
+                <div class="col-lg-12" id="alerta" style="display:none;">
+                    <div class="bs-component">
+                        <div class="alert alert-dismissible alert-danger">
+                            <button class="close" type="button" data-dismiss="alert">×</button>
+                            <span id="textAlerta"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    @using (Html.BeginForm("Alterar", "Chamados", FormMethod.Post, new { @class = "form-valide", enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <input type="hidden" name="Id" id="Id" value="@Model.MChamadoSimples.Id" />
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Numero, "Número do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Numero, new { htmlAttributes = new { @class = "form-control", onchange = "verificaChamado(this.value)", Value = Model.MChamadoSimples.Numero, disabled="disabled" } })
+                            @Html.ValidationMessageFor(model => model.Numero)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Local, "Agencia", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Local" name="Local" data-val="true" data-val-required="Favor selecionar a agencia">
+                                <option value="">Selecione a agencia</option>
+                                @foreach (var item in Model.MAgencia)
+                                {
+                                    <option @(Model.MChamadoSimples.IdLocal == Model.utl.DecodificaId(item.Id) ? "selected" : "") value="@item.Id">@item.NAgencia - @item.Cidade</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Local)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Eng, "Engenheiro da Rota", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Eng" name="Eng" data-val="true" data-val-required="Favor selecionar o Engenheiro da rota">
+                                <option value="">Selecione a Rota da agencia</option>
+                                <option @(Model.MChamadoSimples.Eng == "1" ? "selected" : "") value="1">Anselmo Franklin</option>
+                                <option @(Model.MChamadoSimples.Eng == "2" ? "selected" : "") value="2">Vanessa Mara</option>
+                                <option @(Model.MChamadoSimples.Eng == "3" ? "selected" : "") value="3">Alexandre Machado</option>
+                                <option @(Model.MChamadoSimples.Eng == "4" ? "selected" : "") value="4">Alessandro Bulhoes</option>
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Eng)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Status, "Status do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Status" name="Status" data-val="true" data-val-required="Favor selecionar o Status">
+                                <option value="">Selecione o Status</option>
+                                <option @(Model.MChamadoSimples.Status.ToUpper() == "ABERTO" ? "selected" : "") value="Aberto">Aberto</option>
+                                <option @(Model.MChamadoSimples.Status.ToUpper() == "FECHADO" ? "selected" : "") value="Fechado">Fechado</option>
+                                <option @(Model.MChamadoSimples.Status.ToUpper() == "MATERIAL" ? "selected" : "") value="Material">Material</option>
+                                <option @(Model.MChamadoSimples.Status.ToUpper() == "CANCELADO" ? "selected" : "") value="Cancelado">Cancelado</option>
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Status)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Categoria, "Categoria do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Categoria" name="Categoria" onchange="buscaSubCategoria(this.value)" data-val="true" data-val-required="Favor selecionar a categoria">
+                                <option value="">Selecione a Categoria</option>
+                                @foreach (var item in Model.MCategoria)
+                                {
+                                    <option @(Model.MChamadoSimples.Categoria == item.Id.ToString() ? "selected" : "") value="@item.Id">@item.Nome</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Categoria)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SubCategoria, "Tipo de Serviço", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="SubCategoria" name="SubCategoria" data-val="true" data-val-required="Favor selecionar o tipo de serviço">
+                                <option value="">Selecione a Categoria</option>
+                                @foreach (var item in Model.MSubCategoria)
+                                {
+                                    <option @(Model.MChamadoSimples.SubCategoria == item.Id.ToString() ? "selected" : "") value="@item.Id">@item.Nome</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.SubCategoria)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Relatado, "Direcionamento do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Rota" name="Rota" data-val="true" data-val-required="Favor direcionar o chamado">
+                                <option value="">Selecione a agencia</option>
+                                @foreach (var item in Model.MRota)
+                                {
+                                    <option @(Model.MChamadoSimples.Relatado == item.Id.ToString() ? "selected" : "") value="@item.Id">@item.Nome</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Relatado)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Detalhe, "Descrição do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Detalhe, new { htmlAttributes = new { @class = "form-control", Value = Model.MChamadoSimples.Detalhe } })
+                            @Html.ValidationMessageFor(model => model.Detalhe)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DataInicio, "Data do Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.DataInicio, new { htmlAttributes = new { @class = "form-control", @type = "date", Value = Model.MChamadoSimples.DataInicio.ToString("yyyy-MM-dd") } })
+                            @Html.ValidationMessageFor(model => model.DataInicio)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Arquivo, "Anexar Chamado", new { htmlAttributes = new { @class = "control-label" } })
+                            <input type="file" name="Arquivo" id="Arquivo" class="form-control">
+                            <input type="hidden" name="DocumentoChamado" id="DocumentoChamado" value="@Model.MChamadoSimples.DocumentoChamado" />
+                            @{
+                                    var caminhoDocumento = Server.MapPath("~/Arquivos/Chamado/" + Model.MChamadoSimples.DocumentoChamado);
+                            }
+                            @if (File.Exists(caminhoDocumento))
+                            {
+                                <h6 style="margin-top:10px;">
+                                    Documento anexado!
+                                    <a download href="~/arquivos/chamado/@Model.MChamadoSimples.DocumentoChamado">
+                                        Acesso aqui
+                                    </a>
+                                </h6>
+                            }
+                            else
+                            {
+                                <h6 style="margin-top:10px; color:red">Chamado não anexado!</h6>
+                            }
+
+                        </div>
+
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit">Alterar</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

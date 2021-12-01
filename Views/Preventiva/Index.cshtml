@@ -1,0 +1,197 @@
+﻿@model Gerencial.Models.Preventiva
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">$('#myTable').DataTable()</script>
+
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-th-list"></i> Gerenciar Preventiva</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item">Preventiva</li>
+        <li class="breadcrumb-item active"><a href="#">Gerenciar</a></li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="tile">
+            <div class="col-lg-12">
+                @{
+                    if (ViewBag.Msg != null)
+                    {
+                        if (ViewBag.tipo == 1)
+                        {
+                            <div class="bs-component">
+                                <div class="alert alert-dismissible alert-success">
+                                    <button class="close" type="button" data-dismiss="alert">×</button>@ViewBag.Msg
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="bs-component">
+                                <div class="alert alert-dismissible alert-danger">
+                                    <button class="close" type="button" data-dismiss="alert">×</button><strong>Atenção! </strong>@ViewBag.Msg
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+
+                <h4>Listar Preventivas</h4>
+                <br />
+
+                @using (Html.BeginForm("Busca", "Preventiva", FormMethod.Post, new { @id = "form_filtro", @name = "form_filtro", @class = "form-valide" }))
+                {
+                <div class="form-group row">
+                    <label class="col-lg-2 col-form-label" for="mes_preventiva">Mês da Preventiva</label>
+                    <div class="col-md-4">
+                        <select class="form-control" id="ConsultaMes" name="ConsultaMes">
+                            <option @(Model.ConsultaMes == 1 ? "selected" : "") value="1">Janeiro</option>
+                            <option @(Model.ConsultaMes == 2 ? "selected" : "") value="2">Fevereiro</option>
+                            <option @(Model.ConsultaMes == 3 ? "selected" : "") value="3">Março</option>
+                            <option @(Model.ConsultaMes == 4 ? "selected" : "") value="4">Abril</option>
+                            <option @(Model.ConsultaMes == 5 ? "selected" : "") value="5">Maio</option>
+                            <option @(Model.ConsultaMes == 6 ? "selected" : "") value="6">Junho</option>
+                            <option @(Model.ConsultaMes == 7 ? "selected" : "") value="7">Julho</option>
+                            <option @(Model.ConsultaMes == 8 ? "selected" : "") value="8">Agosto</option>
+                            <option @(Model.ConsultaMes == 9 ? "selected" : "") value="9">Setembro</option>
+                            <option @(Model.ConsultaMes == 10 ? "selected" : "") value="10">Outubro</option>
+                            <option @(Model.ConsultaMes == 11 ? "selected" : "") value="11">Novembro</option>
+                            <option @(Model.ConsultaMes == 12 ? "selected" : "") value="12">Dezembro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Buscar</button>
+                    </div>
+                </div>
+                }
+
+            </div>
+            <div class="tile-body">
+                <table class="table table-hover table-bordered" id="myTable">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" width="25%" style="text-align:center; vertical-align:middle;">Agencia</th>
+                            <th colspan="3" style="text-align:center">Elétrica/Hidráulica</th>
+                            <th colspan="3" style="text-align:center">Ar Condicionado</th>
+                            <th rowspan="2" colspan="2" style="text-align:center; vertical-align:middle;">Editar</th>
+                        </tr>
+                        <tr>
+                            <th style="text-align:center">Data</th>
+                            <th style="text-align:center">Status</th>
+                            <th style="text-align:center">Preventiva</th>
+                            <th style="text-align:center">Data</th>
+                            <th style="text-align:center">Status</th>
+                            <th style="text-align:center">Preventiva</th>
+                            
+                        </tr>
+                       
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.MPreventiva)
+                        {
+                            var caminhoPrevEletrica = "";
+                            var linkPrevEletrica = "";
+                            var prevEletrica = "";
+                            string dataPrevEletrica = string.Empty;
+                            if(item.PreventivaEletrica == 0)
+                            {
+                                prevEletrica = "Não Realizada";
+                            }
+                            else 
+                            {
+                                prevEletrica = "Realizada";
+                                dataPrevEletrica = item.DataPreventivaEletrica?.ToString("dd/MM/yyyy");
+                                caminhoPrevEletrica = Server.MapPath("~/Arquivos/Preventiva/Eletrica/" + item.Mes + "_" + item.IdLocal + ".pdf");
+                                linkPrevEletrica = "/Arquivos/Preventiva/Eletrica/" + item.Mes + "_" + item.IdLocal + ".pdf";
+                            }
+
+                            var caminhoPrevAr = "";
+                            var linkPrevAr = "";
+                            var prevAr = "";
+                            string dataPrevAr = string.Empty;
+                            if(item.PreventivaAr == 0)
+                            {
+                                prevAr = "Não Realizada";
+                            }
+                            else 
+                            {
+                                prevAr = "Realizada";
+                                dataPrevAr = item.DataPreventivaAr?.ToString("dd/MM/yyyy");
+                                caminhoPrevAr = Server.MapPath("~/Arquivos/Preventiva/ArCondicionado/" + item.Mes + "_" + item.IdLocal + ".pdf");
+                                linkPrevAr = "/Arquivos/Preventiva/ArCondicionado/" + item.Mes + "_" + item.IdLocal + ".pdf";
+                            }
+                        <tr>
+                            <td style="text-align:left">@item.Local.ToUpper()</td>
+                            <td style="text-align:center">@dataPrevEletrica</td>
+                            <td style="text-align:center">@prevEletrica</td>
+                            @if (File.Exists(caminhoPrevEletrica))
+                            {
+                                <td style="text-align:center">
+                                    <a href="@linkPrevEletrica">
+                                        <i class="fa fa-print" style="font-size:large"></i>
+                                    </a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td style="text-align:center"> - </td>
+                            }
+                            <td style="text-align:center">@dataPrevAr</td>
+                            <td style="text-align:center">@prevAr</td>
+                            @if (File.Exists(caminhoPrevAr))
+                            {
+                                <td style="text-align:center">
+                                    <a href="@linkPrevAr">
+                                        <i class="fa fa-print" style="font-size:large"></i>
+                                    </a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td style="text-align:center"> - </td>
+                            }
+
+                            @if (item.PreventivaAr != 0 && item.PreventivaEletrica != 0)
+                            {
+                                <td style="text-align:center !important; vertical-align:middle !important;">
+                                    <a href="@Url.Action("Alteracao", "Preventiva", new { Id = item.Id })">
+                                        <i class="fa fa-pencil" style="font-size:large"></i>
+                                    </a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td style="text-align:center !important; vertical-align:middle !important;">
+                                    -
+                                </td>
+                            }
+
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <hr />
+            <div>
+                <span>
+                    <a href="@Url.Action("GerarPreventiva", "Preventiva", new { Id = Model.ConsultaMes })">
+                        <i class="fa fa-server" style="font-size:large"> Gerar Preventiva do Mês</i>
+                    </a>
+                </span>
+                <span style="margin-left:30px;">
+                    @{ 
+                        var linkPreventiva = "/Arquivos/Preventiva/Download/preventiva.zip";
+                    }
+                    <a href="@linkPreventiva">
+                        <i class="fa fa-download" style="font-size:large"> Download Preventiva do Mês</i>
+                    </a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

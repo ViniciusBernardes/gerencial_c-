@@ -1,0 +1,230 @@
+﻿@model  Gerencial.Models.Boletos
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{ var data = Model.MBoletos.AsEnumerable(); }
+
+<script>
+
+    function limpar_filtro() {
+        document.getElementById("ConsultaTipo").value = '0';
+        document.getElementById("ConsultaStatus").value = '0';
+        document.getElementById("ConsultaRota").value = '0';
+        document.getElementById("ConsultaDataInicio").value = '';
+        document.getElementById("ConsultaDataFim").value = '';
+    }
+
+    function filtro_pesquisa() {
+        if (document.getElementById("form_filtro").style.display == 'none')
+            document.getElementById("form_filtro").style.display = 'block';
+        else
+            document.getElementById("form_filtro").style.display = 'none';
+    }
+
+    function confirmExclusao(ur){
+        swal({
+            title: "Deseja Excluir?",
+            text: "",
+            type: "error",
+            showCancelButton: true,
+            confirmButtonText: "Sim!",
+            cancelButtonText: "Não",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }, function (isConfirm) {
+            if (isConfirm) {
+                swal("Deletado!", "Boleto deletado com sucesso.", "success");
+                url = ur
+	            window.location = url;
+            } else {
+                swal("Cancelado", "Não houve a exclusão :)", "error");
+            }
+        });
+    }
+
+</script>
+
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-th-list"></i> Gerenciar Boletos</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item">Boletos</li>
+        <li class="breadcrumb-item active"><a href="#">Gerenciar</a></li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="tile">
+
+            <div>
+                @{
+                    if (ViewBag.Msg != null)
+                    {
+                        if (ViewBag.tipo == 1)
+                        {
+                            <div class="bs-component">
+                                <div class="alert alert-dismissible alert-success">
+                                    <button class="close" type="button" data-dismiss="alert">×</button>@ViewBag.Msg
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="bs-component">
+                                <div class="alert alert-dismissible alert-danger">
+                                    <button class="close" type="button" data-dismiss="alert">×</button><strong>Atenção! </strong>@ViewBag.Msg
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+
+                <h4 class="card-title" onclick="filtro_pesquisa();" style="cursor:pointer;">Filtro de busca</h4>
+
+                @using (Html.BeginForm("Busca", "Boletos", FormMethod.Post, new { @id = "form_filtro", @name = "form_filtro", style = "display:none", @class = "form-valide" }))
+                {
+                    var selecione = "";
+                    var selectStatusAberto = "";
+                    var selectStatusFechado = "";
+
+                    if (ViewBag.ConsultaStatus == "aberto")
+                    { selectStatusAberto = "selected=selected"; }
+                    else
+                    { selectStatusAberto = ""; }
+
+                    if (ViewBag.ConsultaStatus == "fechado")
+                    { selectStatusFechado = "selected=selected"; }
+                    else
+                    { selectStatusFechado = ""; }
+
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="ConsultaTipo">Tipo de Boleto</label>
+                        <div class="col-lg-4">
+                            <select class="form-control custom-select" id="ConsultaTipo" name="ConsultaTipo">
+                                <option value="0">Selecione o tipo de Boleto</option>
+                                @foreach (var item in Model.MCategoria)
+                                {
+                                    if (ViewBag.ConsultaTipo == item.Id.ToString())
+                                    { selecione = "selected=selected"; }
+                                    else
+                                    { selecione = ""; }
+
+                                    <option value="@item.Id" @selecione>@item.Nome</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="ConsultaStatus">Status do Boleto</label>
+                        <div class="col-lg-4">
+                            <select class="form-control custom-select" id="ConsultaStatus" name="ConsultaStatus">
+                                <option value="0">Selecione o status do Boleto</option>
+                                <option @selectStatusAberto value="aberto">Aberto</option>
+                                <option @selectStatusFechado value="fechado">Fechado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="ConsultaRota">Rota</label>
+                        <div class="col-lg-4">
+                            <select class="form-control custom-select" id="ConsultaRota" name="ConsultaRota">
+                                <option value="0">Selecione a Rota</option>
+                                @foreach (var item in Model.MRota)
+                                {
+                                    if (ViewBag.ConsultaRota == item.Id.ToString())
+                                    { selecione = "selected=selected"; }
+                                    else
+                                    { selecione = ""; }
+
+                                    <option @selecione value="@item.Id">@item.Nome</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="chamado">Data de Vencimento</label>
+                        <div class="col-lg-4">
+                            <input type="date" class="form-control" id="ConsultaDataInicio" name="ConsultaDataInicio" placeholder="dd/mm/yyyy" value="@ViewBag.ConsultaDataInicio">
+                            <label class="col-lg-3 col-form-label">até</label>
+                            <input type="date" class="form-control" id="ConsultaDataFim" name="ConsultaDataFim" placeholder="dd/mm/yyyy" value="@ViewBag.ConsultaDataFim">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-lg-8 ml-auto">
+                            <button type="submit" class="btn btn-success">Buscar</button>
+                            &nbsp;&nbsp;
+                            <button type="button" onclick="limpar_filtro()" class="btn btn-inverse">Limpar</button>
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+            <br />
+            <div class="tile-body">
+                <h5>Lista de Boletos</h5>
+                <table class="table table-hover table-bordered" id="sampleTable">
+                    <thead>
+                        <tr>
+                            <th width="15%">Tipo</th>
+                            <th width="20%">Descrição</th>
+                            <th width="15%">Rota</th>
+                            <th width="15%">Data Vencimento</th>
+                            <th width="15%">Valor</th>
+                            <th width="10%" style="text-align:center !important;">Editar</th>
+                            <th width="10%" style="text-align:center !important;">Excluir</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.MBoletos)
+                        {
+                            <tr>
+                                <td>@item.Tipo</td>
+                                <td>@item.Descricao.ToUpper()</td>
+                                <td>@item.Rota</td>
+                                <td>@item.Data.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <span style="float:left !important;">R$</span>
+                                    <span style="float:right !important;">
+                                        @String.Format("{0:N}", Decimal.Parse(item.Valor))
+                                    </span>
+                                </td>
+                                <td style="text-align:center !important; vertical-align:middle !important;">
+                                    <a href="@Url.Action("Alteracao", "Boletos", new { Id = item.Id })">
+                                        <i class="fa fa-pencil" style="font-size:large"></i>
+                                    </a>
+                                </td>
+                                <td style="text-align:center !important; vertical-align:middle !important;">
+                                    <a href="#" onclick="confirmExclusao('@Url.Action("Excluir", "Boletos", new { Id = item.Id })');" id="confirmExclusao">
+                                        <i class="fa fa-remove" style="font-size:large"></i>
+                                    </a>
+                                </td>
+                            </tr>
+
+                        }
+                        <tr style="text-align: left; font-weight: bold; background-color: #333;">
+                            <td colspan="4" align='center' style="color:#FFF !important;">TOTAL</td>
+                            <td align='left' style="color:#FFF !important;">
+                                <span style="float:left !important;">R$</span>
+                                <span style="float:right !important;">
+                                    @String.Format("{0:N}", data.Sum(i => Decimal.Parse(i.Valor)))
+                                </span>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

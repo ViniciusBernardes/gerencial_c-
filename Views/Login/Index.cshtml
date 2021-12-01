@@ -1,0 +1,27 @@
+﻿@model Gerencial.Models.Login
+@{
+    ViewBag.Title = "Gerencial - Login";
+    Layout = "~/Views/Shared/_login.cshtml";
+}
+
+<div class="login-form">
+
+    <h4>Acesso ao Sistema</h4>
+    <form class="form-valide" action="Logar" method="post">
+        <div class="form-group row">
+            <label>Usuário</label>
+            <div class="col-sm-12" style="padding-left:0px !important;">
+                <input type="text" class="form-control" placeholder="" id="Usuario" name="Usuario">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label>Senha</label>
+            <div class="col-sm-12" style="padding-left:0px !important;">
+                <input type="password" class="form-control" placeholder="" id="Senha" name="Senha">
+            </div>
+        </div>
+
+        <button class="btn btn-primary btn-flat m-b-30 m-t-30">Logar</button>
+
+    </form>
+</div>

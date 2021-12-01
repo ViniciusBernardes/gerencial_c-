@@ -1,0 +1,55 @@
+﻿@model  Gerencial.Models.Agencia
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+
+    <div class="col-md-6">
+        <div class="tile">
+            <div class="tile-body">
+
+                <div class="col-lg-12">
+                    <h4 class="card-title">Alterar Agencia</h4>
+                    @using (Html.BeginForm("Alterar", "Agencia", FormMethod.Post, new { @class = "form-valide" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.NAgencia, "Número da Agencia", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.NAgencia, new { htmlAttributes = new { @class = "form-control", @readonly="readonly", Value = @Model.NAgencia } })
+                            @Html.ValidationMessageFor(model => model.NAgencia)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Cidade, "Local", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Cidade, new { htmlAttributes = new { @class = "form-control", Value = @Model.Cidade } })
+                            @Html.ValidationMessageFor(model => model.Cidade)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Km, "Distância da Sede", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Km, new { htmlAttributes = new { @class = "form-control", Value = @Model.Km } })
+                            @Html.ValidationMessageFor(model => model.Km)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rota, "Região", new { htmlAttributes = new { @class = "control-label" } })
+                            <select class="form-control" id="Rota" name="Rota" data-val="true" data-val-required="Favor selecionar a rota">
+                                <option value="">Selecione a Rota da agencia</option>
+                                <option @(Model.Rota.ToUpper() == "ESPIRITO SANTO" ? "selected" : "") value="ESPIRITO SANTO">Espírito Santo</option>
+                                <option @(Model.Rota.ToUpper() == "NORTE" ? "selected" : "") value="Norte">Norte de Minas</option>
+                                <option @(Model.Rota.ToUpper() == "GRANDE BH" ? "selected" : "") value="Grande BH">Grande BH</option>
+                                <option @(Model.Rota.ToUpper() == "TRIANGULO MINEIRO" ? "selected" : "") value="Triangulo Mineiro">Triângulo Mineiro</option>
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Rota)
+                        </div>
+
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit">Alterar</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

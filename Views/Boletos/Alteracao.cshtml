@@ -1,0 +1,99 @@
+﻿@model Gerencial.Models.Boletos
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+    jQuery(function(){
+	    jQuery("#Valor").maskMoney({symbol:'', showSymbol:true, thousands:'.', decimal:',', symbolStay: true});
+        })
+</script>
+
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-th-list"></i> Alterar Boleto</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item">Boleto</li>
+        <li class="breadcrumb-item active"><a href="#">Aletrar</a></li>
+    </ul>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="tile">
+            <div class="row">
+                <div class="col-lg-6">
+                    @using (Html.BeginForm("Alterar", "Boletos", FormMethod.Post, new { @class = "form-valide" }))
+                    {
+                        var selecione = "";
+
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+
+                        <input type="hidden" id="Id" name="Id" value="@Model.MBoletoSimples.Id" />
+                        <div class="form-group">
+                            <label class="control-label" for="Tipo">Tipo de Boleto</label>
+                            <select class="form-control" id="Tipo" name="Tipo" data-val="true" data-val-required="Favor informar o tipo de boleto">
+                                <option value="">Selecione o tipo de Boleto</option>
+                                @foreach (var item in Model.MCategoria)
+                                {
+                                    if (Model.MBoletoSimples.Tipo == item.Id.ToString())
+                                    { selecione = "selected=selected"; }
+                                    else
+                                    { selecione = ""; }
+                                    <option value="@item.Id" @selecione>@item.Nome</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Tipo)
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label" for="Rota">Rota</label>
+                            <select class="form-control" id="Rota" name="Rota" data-val="true" data-val-required="Favor selecionar a rota">
+                                <option value="">Selecione a Rota</option>
+                                @foreach (var item in Model.MRota)
+                                {
+                                    if (Model.MBoletoSimples.Rota == item.Id.ToString())
+                                    { selecione = "selected=selected"; }
+                                    else
+                                    { selecione = ""; }
+                                    <option value="@item.Id" @selecione>@item.Nome</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Rota)
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Descricao, new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Descricao, new { htmlAttributes = new { @class = "form-control", Value = Model.MBoletoSimples.Descricao } })
+                            @Html.ValidationMessageFor(model => model.Descricao)
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Data, "Data Vencimento", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Data, new { htmlAttributes = new { @class = "form-control", @type = "date", Value = Model.MBoletoSimples.Data.ToString("yyyy-MM-dd") } })
+                            @Html.ValidationMessageFor(model => model.Data)
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Valor, "Valor do Boleto", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Valor, new { htmlAttributes = new { @class = "form-control", @Value = String.Format("{0:N}", Decimal.Parse(Model.MBoletoSimples.Valor)) } })
+                            @Html.ValidationMessageFor(model => model.Valor)
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Linha, "Linha Digitável", new { htmlAttributes = new { @class = "control-label" } })
+                            @Html.EditorFor(model => model.Linha, new { htmlAttributes = new { @class = "form-control", @Value = Model.MBoletoSimples.Linha } })
+                            @Html.ValidationMessageFor(model => model.Linha)
+                        </div>
+
+                        <div class="tile-footer">
+                            <button class="btn btn-primary" type="submit">Alterar</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

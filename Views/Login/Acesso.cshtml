@@ -1,0 +1,29 @@
+﻿@model Gerencial.Models.Login
+@{
+    Layout = "~/Views/Shared/_login.cshtml";
+}
+
+    <div class="login-box">
+
+        @using (Html.BeginForm("Logar", "Login", FormMethod.Post, new { @class = "login-form" }))
+        {
+            <h3 class="login-head"><img src="~/images/logo_web.png" width="200px" /></h3>
+            <h5 style="text-align:center">Acesso ao Sistema</h5>
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <div class="form-group">
+                @Html.LabelFor(model => model.Usuario, new { htmlAttributes = new { @class = "control-label" } })
+                @Html.EditorFor(model => model.Usuario, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Usuario)
+
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Senha, new { htmlAttributes = new { @class = "control-label" } })
+                @Html.EditorFor(model => model.Senha, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Senha)
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-sign-in fa-lg fa-fw"></i>Logar</button>
+
+        }
+    </div>
